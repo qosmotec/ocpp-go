@@ -59,8 +59,8 @@ func (s *clientState) AddPendingRequest(requestID string, req ocpp.Request) bool
 }
 
 func (s *clientState) GetPendingRequest(requestID string) (ocpp.Request, bool) {
-	s.mutex.Lock()
-	defer s.mutex.Unlock()
+	s.mutex.RLock()
+	defer s.mutex.RUnlock()
 	if s.requestID != requestID {
 		return nil, false
 	}
@@ -83,8 +83,8 @@ func (s *clientState) ClearPendingRequests() {
 }
 
 func (s *clientState) HasPendingRequest() bool {
-	s.mutex.Lock()
-	defer s.mutex.Unlock()
+	s.mutex.RLock()
+	defer s.mutex.RUnlock()
 	return s.requestID != ""
 }
 
@@ -175,8 +175,8 @@ func (d *serverState) GetClientState(clientID string) ClientState {
 
 func (d *serverState) HasPendingRequest(clientID string) bool {
 	if d.mutex != nil {
-		d.mutex.Lock()
-		defer d.mutex.Unlock()
+		d.mutex.RLock()
+		defer d.mutex.RUnlock()
 	}
 	state, exists := d.pendingRequestState[clientID]
 	return exists && state.HasPendingRequest()
@@ -184,8 +184,8 @@ func (d *serverState) HasPendingRequest(clientID string) bool {
 
 func (d *serverState) HasPendingRequests() bool {
 	if d.mutex != nil {
-		d.mutex.Lock()
-		defer d.mutex.Unlock()
+		d.mutex.RLock()
+		defer d.mutex.RUnlock()
 	}
 	for _, s := range d.pendingRequestState {
 		if s.HasPendingRequest() {
